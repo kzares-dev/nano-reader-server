@@ -8,12 +8,12 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     @Post('signup')
-    signup(@Body() dto: AuthDto ) { // dto is for type and field validations
+    signup(@Body() dto: AuthDto) { // dto is for type and field validations
         return this.authService.signup(dto);
     }
 
     @Post('signin')
-    signIn(@Body() dto: AuthDto ) { // dto is for type and field validations
+    signIn(@Body() dto: AuthDto) { // dto is for type and field validations
         return this.authService.signin(dto);
     }
 }

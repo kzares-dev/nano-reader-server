@@ -4,12 +4,15 @@ import { AuthDto } from './dto';
 import { Model } from 'mongoose';
 import * as argon from 'argon2';
 import { User } from 'src/mongoose/user.model';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable({})
 export class AuthService {
 
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>, // load the mongoose UserModel class
+        private jwt: JwtService,
     ) { }
 
     async signup(dto: AuthDto) {
@@ -22,8 +25,7 @@ export class AuthService {
         })
         const user = await newUser.save();
         //return saved user 
-        // TODO: return JWT with the user info
-        return user
+        return this.signToken(user._id.toString(), user.email)
     };
 
     async signin(dto: AuthDto) {
@@ -34,7 +36,7 @@ export class AuthService {
             // If user doesn't exist, throw exception
             throw new NotFoundException('User not found');
         }
-        
+
         // Compare provided password with stored password
         const passwordMatch = await argon.verify(user.password, dto.password);
 
@@ -42,8 +44,22 @@ export class AuthService {
             // If password is incorrect, throw exception
             throw new UnauthorizedException('Incorrect password');
         }
-
         // If user exists and password matches, return the user
-        return user;
+        return this.signToken(user._id.toString(), user.email)
     };
+
+    signToken(
+        userId: string,
+        email: string
+    )  : Promise<string> {
+        const payload = {
+            sub: userId,
+            email,
+        }
+
+        return this.jwt.signAsync(payload, {
+            expiresIn: '15m',
+            secret: 'R2h8sPqJ4T9g3nF1',
+        } )
+    }
 }
