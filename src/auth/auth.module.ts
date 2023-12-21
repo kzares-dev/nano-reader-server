@@ -4,6 +4,7 @@ import { AuthService } from './auth.service'
 import { MongooseModule } from '@nestjs/mongoose'
 import { UserSchema } from 'src/mongoose/user.model'
 import { JwtModule } from '@nestjs/jwt'
+import { JwtStrategy } from './strategy'
 
 @Module({
     imports: [
@@ -12,6 +13,6 @@ import { JwtModule } from '@nestjs/jwt'
         // TODO: Congig module import 
     ],
     controllers: [AuthController],
-    providers: [AuthService],
+    providers: [AuthService, JwtStrategy],
 })
 export class AuthModule { }
