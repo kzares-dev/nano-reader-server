@@ -46,7 +46,7 @@ export class AuthService {
         }
         console.log(this.signToken(user._id.toString(), user.email))
         // If user exists and password matches, return the user
-        return this.signToken(user._id.toString(), user.email)
+        return user
     };
 
     async signToken(userId: string, email: string): Promise<{ access_token: string }> {

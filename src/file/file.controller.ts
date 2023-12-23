@@ -13,8 +13,25 @@ export class FileController {
     getFile(
         @Param('fileId') fileId: string,
     ) {
-        return this.fileService.getFile(fileId)
+        return this.fileService.getFile(fileId);
     };
+
+    @Get('user-files/:userId')
+    getUserFiles(
+        @Param('userId') userId: string,
+    ) {
+        return this.fileService.getUserFiles(userId);
+    }
+
+    @Post('search-by-title')
+    searchFilesByTitle(@Body() { query }: { query: string }) {
+        return this.fileService.searchFilesByTitle(query);
+    }
+
+    @Post('search-by-author')
+    searchFilesByAuthor(@Body() { query }: { query: string }) {
+        return this.fileService.searchFilesByAuthor(query);
+    }
 
     @Get('delete/:fileId')
     deleteFile(
@@ -33,7 +50,7 @@ export class FileController {
         @Body() dto: FileDto,
         @Param('fileId') fileId: string,
     ) {
-        return this.fileService.editFile( fileId ,dto)
+        return this.fileService.editFile(fileId, dto)
     };
 
 
