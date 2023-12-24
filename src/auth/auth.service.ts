@@ -24,8 +24,11 @@ export class AuthService {
             password: hash,
         })
         const user = await newUser.save();
-        //return saved user 
-        return this.signToken(user._id.toString(), user.email)
+        // return the jwt for current session
+
+        return await this.signToken(user._id.toString(), user.email)
+
+
     };
 
     async signin(dto: AuthDto) {
@@ -44,22 +47,23 @@ export class AuthService {
             // If password is incorrect, throw exception
             throw new UnauthorizedException('Incorrect password');
         }
-        console.log(this.signToken(user._id.toString(), user.email))
-        // If user exists and password matches, return the user
-        return user
+        // If user exists and password matches, re turn the the jwt for current session
+
+        return await this.signToken(user._id.toString(), user.email)
+
     };
 
-    async signToken(userId: string, email: string): Promise<{ access_token: string }> {
+    async signToken(userId: string, email: string): Promise<{access_token: string}> {
         const payload = {
             sub: userId,
             email,
         }
 
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '6h',
+            expiresIn: '7d',
             secret: 'R2h8sPqJ4T9g3nF1',
         })
 
-        return { access_token: token, }
+        return{ access_token: token }
     }
 }
