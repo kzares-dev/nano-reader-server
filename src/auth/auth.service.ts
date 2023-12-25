@@ -26,7 +26,7 @@ export class AuthService {
         const user = await newUser.save();
         // return the jwt for current session
 
-        return await this.signToken(user._id.toString(), user.email)
+        return this.signToken(user._id.toString(), user.email)
 
 
     };
@@ -49,7 +49,7 @@ export class AuthService {
         }
         // If user exists and password matches, re turn the the jwt for current session
 
-        return await this.signToken(user._id.toString(), user.email)
+        return this.signToken(user._id.toString(), user.email)
 
     };
 
