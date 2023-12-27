@@ -20,6 +20,10 @@ export const FileSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+    },
+    isFavorite: {
+        type: Boolean,
+        default: false,
     }
 })
 
@@ -30,4 +34,5 @@ export interface File {
     fileUrl: string,
     imageUrl: string,
     userId: string,
+    isFavorite: boolean,
 }

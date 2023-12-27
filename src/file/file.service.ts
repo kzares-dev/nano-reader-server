@@ -28,101 +28,124 @@ export class FileService {
 
     };
 
-
-    async getUserFiles(userId: string) {
+    async updateFileFavoriteStatus(fileId: string, value: boolean) {
         try {
-            // Get files with corresponding userId
-            const files = await this.fileModel.find({ userId: userId });
+            const file = await this.fileModel.findById(fileId);
 
-            if (files.length === 0) {
-                throw new NotFoundException('No files found for this user');
+            if (!file) {
+                throw new NotFoundException('File not found');
             }
-            // Returning files
-            return files;
-        } catch (error) {
-            throw new NotFoundException('User not found');
+
+            file.isFavorite = value;
+            await file.save();
+
+            return file;
+        } catch {
+            throw new NotFoundException('File not found');
         }
     }
 
-    async searchFilesByTitle(titleQuery: string) {
+      async searchFiles(userId: string, query: string): Promise<File[]> {
         try {
-            // Realizar la búsqueda de archivos por título
-            const files = await this.fileModel.find({ title: { $regex: titleQuery, $options: 'i' } });
-
-            if (files.length === 0) {
-                throw new NotFoundException('No files found for the given title query');
-            }
-
-            // Retornar los archivos encontrados
-            return files;
+          const searchQuery = {
+            $and: [
+              { userId: userId },
+              {
+                $or: [
+                  { title: { $regex: query, $options: 'i' } },
+                  { author: { $regex: query, $options: 'i' } },
+                ],
+              },
+            ],
+          };
+      
+          const files = await this.fileModel.find(searchQuery);
+      
+          if (files.length === 0) {
+            throw new NotFoundException('No files found for the given search query');
+          }
+      
+          return files;
         } catch (error) {
-            throw new NotFoundException('Error occurred while searching for files by title');
+          throw new NotFoundException('Error occurred while searching for files');
         }
-    }
+      }
 
-    async searchFilesByAuthor(titleQuery: string) {
+      async searchFavoriteFiles(userId: string, query: string): Promise<File[]> {
         try {
-            // Realizar la búsqueda de archivos por título
-            const files = await this.fileModel.find({ author: { $regex: titleQuery, $options: 'i' } });
-
-            if (files.length === 0) {
-                throw new NotFoundException('No files found for the given title query');
-            }
-
-            // Retornar los archivos encontrados
-            return files;
+          // Get files with isFavorite = true and matching title or author
+          const searchQuery = {
+            $and: [
+              { userId: userId },
+              { isFavorite: true },
+              {
+                $or: [
+                  { title: { $regex: query, $options: 'i' } },
+                  { author: { $regex: query, $options: 'i' } },
+                ],
+              },
+            ],
+          };
+      
+          const files = await this.fileModel.find(searchQuery);
+      
+          if (files.length === 0) {
+            throw new NotFoundException('No favorite files found for the given search query');
+          }
+      
+          return files;
         } catch (error) {
-            throw new NotFoundException('Error occurred while searching for files by title');
+          throw new NotFoundException('Error occurred while searching for favorite files');
         }
-    }
+      }
 
 
     async deleteFile(fileId: string) {
-    try {
-        // Find the file by ID and delete it
-        const deletedFile = await this.fileModel.findByIdAndDelete(fileId);
+        try {
+            // Find the file by ID and delete it
+            const deletedFile = await this.fileModel.findByIdAndDelete(fileId);
 
-        // If the file does not exist, throw an error
-        if (!deletedFile) {
+            // If the file does not exist, throw an error
+            if (!deletedFile) {
+                throw new NotFoundException('File not found');
+            }
+
+            // Return the deleted file
+            return deletedFile;
+        } catch {
+            // Handle any errors that occur, for example, throw an exception
             throw new NotFoundException('File not found');
         }
-
-        // Return the deleted file
-        return deletedFile;
-    } catch {
-        // Handle any errors that occur, for example, throw an exception
-        throw new NotFoundException('File not found');
     }
-}
 
     async createFile(dto: FileDto) {
 
-    // save the new file in db
-    const newFile = new this.fileModel({
-        ...dto
-    })
-    const file = await newFile.save();
-    return file
-};
+        // save the new file in db
+        const newFile = new this.fileModel({
+            ...dto
+        })
+        const file = await newFile.save();
+        return file
+    };
 
 
     async editFile(fileId: string, dto: FileDto) {
-    try {
-        // Find the file by ID and update it with the new data
-        const editedFile = await this.fileModel.findByIdAndUpdate(fileId, dto, { new: true, runValidators: true });
+        try {
+            // Find the file by ID and update it with the new data
+            const editedFile = await this.fileModel.findByIdAndUpdate(fileId, dto, { new: true, runValidators: true });
 
-        // If the file does not exist, throw an error
-        if (!editedFile) {
-            throw new NotFoundException('File not found');
+            // If the file does not exist, throw an error
+            if (!editedFile) {
+                throw new NotFoundException('File not found');
+            }
+
+            // Return the edited file
+            return editedFile;
+        } catch (error) {
+            // Handle any errors that occur, for example, throw an exception
+            throw new Error('An error occurred while editing the file: ' + error);
         }
-
-        // Return the edited file
-        return editedFile;
-    } catch (error) {
-        // Handle any errors that occur, for example, throw an exception
-        throw new Error('An error occurred while editing the file: ' + error);
     }
-}
 
 
 

@@ -16,21 +16,21 @@ export class FileController {
         return this.fileService.getFile(fileId);
     };
 
-    @Get('user-files/:userId')
-    getUserFiles(
-        @Param('userId') userId: string,
+    @Post('update-status')
+    updateFileFavoriteStatus(
+        @Body() { fileId, value }: { fileId: string, value: boolean }
     ) {
-        return this.fileService.getUserFiles(userId);
+        return this.fileService.updateFileFavoriteStatus(fileId, value);
+    };
+
+    @Post('search')
+    searchFiles(@Body() { query, userId }: { query: string, userId: string }) {
+        return this.fileService.searchFiles(userId ,query);
     }
 
-    @Post('search-by-title')
-    searchFilesByTitle(@Body() { query }: { query: string }) {
-        return this.fileService.searchFilesByTitle(query);
-    }
-
-    @Post('search-by-author')
-    searchFilesByAuthor(@Body() { query }: { query: string }) {
-        return this.fileService.searchFilesByAuthor(query);
+    @Post('search-favorite')
+    searchFavoriteFiles(@Body() { query, userId }: { query: string, userId: string }) {
+        return this.fileService.searchFavoriteFiles(userId ,query);
     }
 
     @Get('delete/:fileId')

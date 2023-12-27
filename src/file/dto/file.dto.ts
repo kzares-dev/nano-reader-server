@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
 
 export class FileDto {
 
@@ -20,4 +20,7 @@ export class FileDto {
     @IsNotEmpty()
     @IsString()
     userId: string;
+
+    @IsBoolean()
+    isFavorite: boolean
 }
